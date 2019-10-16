@@ -90,6 +90,8 @@ public class TickrateContainer {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new TickEvents());
+        new TickrateChanger();
         TickrateAPI.changeTickrate(TickrateChanger.DEFAULT_TICKRATE);
     }
 

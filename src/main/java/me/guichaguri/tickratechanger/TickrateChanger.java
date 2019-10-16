@@ -3,6 +3,8 @@ package me.guichaguri.tickratechanger;
 import java.io.File;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -12,11 +14,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import me.guichaguri.tickratechanger.mixin.MixinMinecraft;
+import me.guichaguri.tickratechanger.mixin.MixinMinecraftServer;
+
 /**
  * @author Guilherme Chaguri
  */
-@TransformerExclusions({"me.guichaguri.tickratechanger"})
-public class TickrateChanger implements IFMLLoadingPlugin, IFMLCallHook {
+public class TickrateChanger {
 
     public static TickrateChanger INSTANCE;
     public static Logger LOGGER = LogManager.getLogger("Tickrate Changer");
@@ -45,36 +49,13 @@ public class TickrateChanger implements IFMLLoadingPlugin, IFMLCallHook {
     public static boolean SHOW_MESSAGES = true;
     // Change sound speed
     public static boolean CHANGE_SOUND = true;
+    // Interrupt Server Sleep
+    public static boolean INTERRUPT;
 
     public TickrateChanger() {
         INSTANCE = this;
     }
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[]{"me.guichaguri.tickratechanger.TickrateTransformer"};
-    }
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
-    @Override
-    public String getSetupClass() {
-        return "me.guichaguri.tickratechanger.TickrateChanger";
-    }
-    @Override
-    public void injectData(Map<String, Object> data) {
-
-    }
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
-    }
-
-    @Override
-    public Void call() throws Exception {
-        return null;
-    }
 
     @SideOnly(Side.CLIENT)
     public void updateClientTickrate(float tickrate, boolean log) {
@@ -85,13 +66,20 @@ public class TickrateChanger implements IFMLLoadingPlugin, IFMLCallHook {
 
         Minecraft mc = Minecraft.getMinecraft();
         if(mc == null) return; // Wut
-
-        mc.timer.tickLength = 1000F / tickrate;
+        if(tickrate>0) {
+        	mc.timer.tickLength = 1000F / tickrate;
+        }else if(tickrate==0) {
+        	mc.timer.tickLength=Float.MAX_VALUE;
+        }
     }
 
     public void updateServerTickrate(float tickrate, boolean log) {
+    	INTERRUPT=true;
         if(log) LOGGER.info("Updating server tickrate to " + tickrate);
-
-        MILISECONDS_PER_TICK = (long)(1000L / tickrate);
+        if(tickrate>0) {
+        	MILISECONDS_PER_TICK = (long)(1000L / tickrate);
+        }else if(tickrate==0) {
+        	MILISECONDS_PER_TICK = Long.MAX_VALUE;
+        }
     }
 }

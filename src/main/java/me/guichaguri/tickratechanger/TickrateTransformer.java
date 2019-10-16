@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * @author Guilherme Chaguri
  */
-public class TickrateTransformer implements IClassTransformer {
+/*public class TickrateTransformer implements IClassTransformer {
     @Override
     public byte[] transform(String name, String name2, byte[] bytes) {
         if(bytes == null) return null;
@@ -56,7 +56,6 @@ public class TickrateTransformer implements IClassTransformer {
                             continue;
                         }
                     }
-
                     list.add(node);
                 }
 
@@ -99,3 +98,4 @@ public class TickrateTransformer implements IClassTransformer {
     }
 
 }
+*/

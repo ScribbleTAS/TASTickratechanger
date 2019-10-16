@@ -1,16 +1,17 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
 
 version = "1.0.13"
 group = "me.guichaguri.tickratechanger"
@@ -21,28 +22,40 @@ minecraft {
     runDir = "run"
     mappings = "snapshot_20170624"
 }
-
-jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'me.guichaguri.tickratechanger.TickrateChanger',
-                   'FMLCorePluginContainsFMLMod': 'true',
-                   'FMLAT': 'tickratechanger_at.cfg'
+configurations {
+    bundled
+    provided
+    // Make compile extend from our provided configuration so that things added to bundled end up on the compile classpath
+    compile.extendsFrom(bundled)
+}
+repositories {
+    mavenCentral()
+    maven {
+        name = 'sponge'
+        url = 'http://repo.spongepowered.org/maven'
     }
 }
-
-// Create deobf dev jars
-task deobfJar(type: Jar) {
+jar {
     from sourceSets.main.output
     classifier = 'deobf'
     manifest {
         attributes 'FMLCorePlugin': 'me.guichaguri.tickratechanger.TickrateChanger',
                    'FMLCorePluginContainsFMLMod': 'true',
-                   'FMLAT': 'tickratechanger_at.cfg'
+                   'FMLAT': 'tickratechanger_at.cfg',
+                   'MixinConfigs': 'mixins.tas.json',
+                   'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                   'ForceLoadAsMod': 'true'
     }
 }
 
 dependencies {
-
+    compile('org.spongepowered:mixin:0.7.10-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+        exclude module: 'log4j-core'
+    }
 }
 
 processResources {
@@ -58,8 +71,13 @@ processResources {
         exclude 'mcmod.info'
     }
 }
-
-artifacts {
-	archives deobfJar 
-	archives jar
+sourceSets {
+    main {
+        ext.refMap = "mixins.tas.refmap.json"
+    }
+}
+mixin {
+    // Specify "notch" or "searge" here
+    defaultObfuscationEnv searge
+    add sourceSets.main, "mixins.tas.refmap.json"
 }
