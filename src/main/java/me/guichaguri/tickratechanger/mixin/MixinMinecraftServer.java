@@ -112,22 +112,22 @@ public abstract class MixinMinecraftServer {
 						else
 							msToTick = 1L;
 					}
-					synchronized (this.futureTaskQueue) {
-						while (!this.futureTaskQueue.isEmpty()) {
-							try {
-								TickrateChanger.LOGGER.debug("Processing Future Task Queue");
-								((FutureTask) this.futureTaskQueue.poll()).run();
-							} catch (Throwable var9) {
-								var9.printStackTrace();
-							}
-						}
-					}
 					for (long o = 0; o < msToTick; o++) {
 						if (TickrateChanger.INTERRUPT) {
 							TickrateChanger.LOGGER.info("Interrupting " + o + " " + msToTick);
 							msToTick = 1L;
 							currentTime = System.currentTimeMillis();
 							TickrateChanger.INTERRUPT = false;
+						}
+						synchronized (this.futureTaskQueue) {
+							while (!this.futureTaskQueue.isEmpty()) {
+								try {
+									TickrateChanger.LOGGER.debug("Processing Future Task Queue");
+									((FutureTask) this.futureTaskQueue.poll()).run();
+								} catch (Throwable var9) {
+									var9.printStackTrace();
+								}
+							}
 						}
 						try {
 							Thread.sleep(1L);
