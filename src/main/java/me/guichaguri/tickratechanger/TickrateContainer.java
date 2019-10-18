@@ -55,16 +55,22 @@ public class TickrateContainer {
         Configuration cfg = new Configuration(TickrateChanger.CONFIG_FILE);
         TickrateChanger.DEFAULT_TICKRATE = (float)cfg.get("default", "tickrate", 20.0,
                 "Default tickrate. The game will always initialize with this value.").getDouble(20);
-        TickrateChanger.MIN_TICKRATE = (float)cfg.get("minimum", "tickrate", 0.1,
-                "Minimum tickrate from servers. Prevents really low tickrate values.").getDouble(0.1);
+        TickrateChanger.MIN_TICKRATE = (float)cfg.get("minimum", "tickrate", 0,
+                "Minimum tickrate from servers. Prevents really low tickrate values.").getDouble(0);
         TickrateChanger.MAX_TICKRATE = (float)cfg.get("maximum", "tickrate", 1000,
                 "Maximum tickrate from servers. Prevents really high tickrate values.").getDouble(1000);
+        
+        //Added in TASTickratechanger
+        TickrateChanger.TICKCOUNTERBOARDER = (float) cfg.get("tickcounter", "tickrate", 2.0,
+        		"In Tickrates below this value, a Tickcounter will be displayed in the console.").getDouble(2);
+        
         TickrateChanger.SHOW_MESSAGES = cfg.get("miscellaneous", "show-messages", true,
                 "Whether it will show log messages in the console and the game").getBoolean(true);
         TickrateChanger.CHANGE_SOUND = cfg.get("miscellaneous", "change-sound", true,
                 "Whether it will change the sound speed").getBoolean();
         KEYS_AVAILABLE = cfg.get("miscellaneous", "keybindings", false,
                 "Whether it will have special keys for setting the tickrate").getBoolean(false);
+        
 
         if(KEYS_AVAILABLE) {
             // Keys
@@ -90,7 +96,7 @@ public class TickrateContainer {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new TickEvents());
+        MinecraftForge.EVENT_BUS.register(new TickrateEvents());
         new TickrateChanger();
         TickrateAPI.changeTickrate(TickrateChanger.DEFAULT_TICKRATE);
     }

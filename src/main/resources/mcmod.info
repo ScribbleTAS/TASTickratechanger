@@ -1,14 +1,14 @@
 [
 {
-  "modid": "tickratechanger",
-  "name": "Tickrate Changer",
+  "modid": "tastickratechanger",
+  "name": "TAS Tickrate Changer",
   "description": "Let you change the client/server tickrate",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "http://guichaguri.github.io/TickrateChanger/",
   "updateUrl": "",
-  "authorList": ["Guichaguri"],
-  "credits": "",
+  "authorList": ["Guichaguri, Cubitect, ScribbleLP"],
+  "credits": "Merging the Tickratechanger with some features of Cubitect's Cubitick Mod...",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

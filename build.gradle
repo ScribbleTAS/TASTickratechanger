@@ -7,15 +7,21 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
     }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'java'
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "1.0.13"
+version = "Alpha"
 group = "me.guichaguri.tickratechanger"
-archivesBaseName = "TickrateChanger"
+archivesBaseName = "TASTickrateChanger-1.12"
 
 minecraft {
     version = "1.12.2-14.23.0.2486"
@@ -42,7 +48,7 @@ jar {
         attributes 'FMLCorePlugin': 'me.guichaguri.tickratechanger.TickrateChanger',
                    'FMLCorePluginContainsFMLMod': 'true',
                    'FMLAT': 'tickratechanger_at.cfg',
-                   'MixinConfigs': 'mixins.tas.json',
+                   'MixinConfigs': 'mixins.ticks.json',
                    'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                    'ForceLoadAsMod': 'true'
     }
@@ -73,11 +79,27 @@ processResources {
 }
 sourceSets {
     main {
-        ext.refMap = "mixins.tas.refmap.json"
+        ext.refMap = "mixins.ticks.refmap.json"
+    }
+}
+shadowJar {
+    mainSpec.sourcePaths.clear()
+
+    dependsOn reobfJar
+
+    configurations = [project.configurations.compile]
+    relocate 'org.msgpack', 'me.guichaguri.tickratechanger.repack.org.msgpack'
+    relocate 'com.fasterxml', 'me.guichaguri.tickratechanger.repack.com.fasterxml'
+    classifier "shadow"
+    exclude 'dummyThing'
+
+
+    afterEvaluate {
+        from zipTree(reobfJar.jar)
     }
 }
 mixin {
     // Specify "notch" or "searge" here
     defaultObfuscationEnv searge
-    add sourceSets.main, "mixins.tas.refmap.json"
+    add sourceSets.main, "mixins.ticks.refmap.json"
 }

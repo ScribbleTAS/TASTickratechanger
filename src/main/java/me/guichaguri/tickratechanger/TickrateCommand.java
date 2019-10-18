@@ -104,7 +104,7 @@ public class TickrateCommand extends CommandBase {
             tab.add("--dontupdate");
 
         }
-        return tab;
+        return getListOfStringsMatchingLastWord(args, tab);
     }
 
     @Override
