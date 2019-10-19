@@ -1,5 +1,7 @@
 package me.guichaguri.tickratechanger;
 
+import org.lwjgl.input.Keyboard;
+
 import me.guichaguri.tickratechanger.TickrateMessageHandler.TickrateMessage;
 import me.guichaguri.tickratechanger.api.TickrateAPI;
 import net.minecraft.client.Minecraft;
@@ -27,7 +29,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToSe
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Keyboard;
 
 /**
  * @author Guilherme Chaguri
@@ -44,7 +45,11 @@ public class TickrateContainer {
     public static KeyBinding KEY_40 = null;
     public static KeyBinding KEY_60 = null;
     public static KeyBinding KEY_100 = null;
-
+    
+    public static KeyBinding KEY_PAUSE=null;
+    public static KeyBinding KEY_ADVANCE=null;
+    public static KeyBinding KEY_CLOSEGUIS=null;
+    
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         TickrateChanger.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("TickrateChanger");
@@ -66,30 +71,37 @@ public class TickrateContainer {
         
         TickrateChanger.SHOW_MESSAGES = cfg.get("miscellaneous", "show-messages", true,
                 "Whether it will show log messages in the console and the game").getBoolean(true);
-        TickrateChanger.CHANGE_SOUND = cfg.get("miscellaneous", "change-sound", true,
-                "Whether it will change the sound speed").getBoolean();
-        KEYS_AVAILABLE = cfg.get("miscellaneous", "keybindings", false,
-                "Whether it will have special keys for setting the tickrate").getBoolean(false);
         
-
-        if(KEYS_AVAILABLE) {
-            // Keys
-            KEY_5 = new KeyBinding("tickratechanger.keybinding.5", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_10 = new KeyBinding("tickratechanger.keybinding.10", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_15 = new KeyBinding("tickratechanger.keybinding.15", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_20 = new KeyBinding("tickratechanger.keybinding.20", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_40 = new KeyBinding("tickratechanger.keybinding.40", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_60 = new KeyBinding("tickratechanger.keybinding.60", Keyboard.KEY_NONE, "key.categories.misc");
-            KEY_100 = new KeyBinding("tickratechanger.keybinding.100", Keyboard.KEY_NONE, "key.categories.misc");
-            ClientRegistry.registerKeyBinding(KEY_5);
-            ClientRegistry.registerKeyBinding(KEY_10);
-            ClientRegistry.registerKeyBinding(KEY_15);
-            ClientRegistry.registerKeyBinding(KEY_20);
-            ClientRegistry.registerKeyBinding(KEY_40);
-            ClientRegistry.registerKeyBinding(KEY_60);
-            ClientRegistry.registerKeyBinding(KEY_100);
+        
+        if(event.getSide().isClient()) {
+        	TickrateChanger.CHANGE_SOUND = cfg.get("miscellaneous", "change-sound", true,
+                    "Whether it will change the sound speed").getBoolean();
+            KEYS_AVAILABLE = cfg.get("miscellaneous", "keybindings", false,
+                    "Whether it will have special keys for setting the tickrate").getBoolean(false);
+	        if(KEYS_AVAILABLE) {
+	            // Keys
+	            KEY_5 = new KeyBinding("tickratechanger.keybinding.5", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_10 = new KeyBinding("tickratechanger.keybinding.10", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_15 = new KeyBinding("tickratechanger.keybinding.15", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_20 = new KeyBinding("tickratechanger.keybinding.20", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_40 = new KeyBinding("tickratechanger.keybinding.40", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_60 = new KeyBinding("tickratechanger.keybinding.60", Keyboard.KEY_NONE, "key.categories.misc");
+	            KEY_100 = new KeyBinding("tickratechanger.keybinding.100", Keyboard.KEY_NONE, "key.categories.misc");
+	            ClientRegistry.registerKeyBinding(KEY_5);
+	            ClientRegistry.registerKeyBinding(KEY_10);
+	            ClientRegistry.registerKeyBinding(KEY_15);
+	            ClientRegistry.registerKeyBinding(KEY_20);
+	            ClientRegistry.registerKeyBinding(KEY_40);
+	            ClientRegistry.registerKeyBinding(KEY_60);
+	            ClientRegistry.registerKeyBinding(KEY_100);
+	        }
+	        	KEY_PAUSE = new KeyBinding("Pause Key", Keyboard.KEY_O, "key.categories.misc");
+	        	KEY_ADVANCE = new KeyBinding("TickAdvance Key", Keyboard.KEY_P, "key.categories.misc");
+	        	KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "key.categories.misc");
+	        	ClientRegistry.registerKeyBinding(KEY_PAUSE);
+	        	ClientRegistry.registerKeyBinding(KEY_ADVANCE);
+	        	ClientRegistry.registerKeyBinding(KEY_CLOSEGUIS);
         }
-
         cfg.save();
     }
 
@@ -183,6 +195,18 @@ public class TickrateContainer {
 
     @SubscribeEvent
     public void key(KeyInputEvent event) {
+    	
+    	if(KEY_PAUSE.isPressed()) {
+    		TickrateAPI.pauseUnpauseGame();
+    	}
+    	if(KEY_ADVANCE.isPressed()) {
+    		TickrateAPI.advanceTick();
+    	}
+    	if(KEY_CLOSEGUIS.isPressed()) {
+    		if(TickrateAPI.getClientTickrate()==0){
+    			Minecraft.getMinecraft().displayGuiScreen(null);
+    		}
+    	}
         if(!KEYS_AVAILABLE) return;
 
         float tickrate;

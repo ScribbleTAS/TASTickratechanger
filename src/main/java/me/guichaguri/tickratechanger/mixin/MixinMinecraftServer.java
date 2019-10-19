@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.FutureTask;
 
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -53,6 +54,8 @@ public abstract class MixinMinecraftServer {
 	public abstract void systemExitNow();
 	@Shadow
 	private Queue < FutureTask<? >> futureTaskQueue;
+	@Shadow
+	private static Logger LOG;
 	
 	private static long msToTick;
 	
@@ -75,14 +78,14 @@ public abstract class MixinMinecraftServer {
 
                  if (j > 2000L && this.currentTime - this.timeOfLastWarning >= 15000L)
                  {
-                     TickrateChanger.LOGGER.warn("Can't keep up! Did the system time change, or is the server overloaded? Running {}ms behind, skipping {} tick(s)", Long.valueOf(j), Long.valueOf(j / 50L));
+                     LOG.warn("Can't keep up! Did the system time change, or is the server overloaded? Running {}ms behind, skipping {} tick(s)", Long.valueOf(j), Long.valueOf(j / 50L));
                      j = 2000L;
                      this.timeOfLastWarning = this.currentTime;
                  }
 
                  if (j < 0L)
                  {
-                	 TickrateChanger.LOGGER.warn("Time ran backwards! Did the system time change?");
+                	 LOG.warn("Time ran backwards! Did the system time change?");
                      j = 0L;
                  }
 
@@ -114,7 +117,7 @@ public abstract class MixinMinecraftServer {
 					}
 					for (long o = 0; o < msToTick; o++) {
 						if (TickrateChanger.INTERRUPT) {
-							TickrateChanger.LOGGER.info("Interrupting " + o + " " + msToTick);
+							LOG.info("Interrupting " + o + " " + msToTick);
 							msToTick = 1L;
 							currentTime = System.currentTimeMillis();
 							TickrateChanger.INTERRUPT = false;
@@ -122,7 +125,7 @@ public abstract class MixinMinecraftServer {
 						synchronized (this.futureTaskQueue) {
 							while (!this.futureTaskQueue.isEmpty()) {
 								try {
-									TickrateChanger.LOGGER.debug("Processing Future Task Queue");
+									LOG.debug("Processing Future Task Queue");
 									((FutureTask) this.futureTaskQueue.poll()).run();
 								} catch (Throwable var9) {
 									var9.printStackTrace();
@@ -132,8 +135,8 @@ public abstract class MixinMinecraftServer {
 						try {
 							Thread.sleep(1L);
 						} catch (InterruptedException e) {
-							TickrateChanger.LOGGER.error("Thread.sleep in MixinMinecraft couldn't be processed!");
-							TickrateChanger.LOGGER.catching(e);
+							LOG.error("Thread.sleep in MixinMinecraft couldn't be processed!");
+							LOG.catching(e);
 						}
 					}
                  this.serverIsRunning = true;
@@ -154,7 +157,7 @@ public abstract class MixinMinecraftServer {
      }
      catch (Throwable throwable1)
      {
-         TickrateChanger.LOGGER.error("Encountered an unexpected exception", throwable1);
+         LOG.error("Encountered an unexpected exception", throwable1);
          CrashReport crashreport = null;
 
          if (throwable1 instanceof ReportedException)
@@ -170,11 +173,11 @@ public abstract class MixinMinecraftServer {
 
          if (crashreport.saveToFile(file1))
          {
-             TickrateChanger.LOGGER.error("This crash report has been saved to: {}", (Object)file1.getAbsolutePath());
+             LOG.error("This crash report has been saved to: {}", (Object)file1.getAbsolutePath());
          }
          else
          {
-        	 TickrateChanger.LOGGER.error("We were unable to save this crash report to disk.");
+        	 LOG.error("We were unable to save this crash report to disk.");
          }
 
          net.minecraftforge.fml.common.FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
@@ -189,7 +192,7 @@ public abstract class MixinMinecraftServer {
          }
          catch (Throwable throwable)
          {
-             TickrateChanger.LOGGER.error("Exception stopping the server", throwable);
+             LOG.error("Exception stopping the server", throwable);
          }
          finally
          {

@@ -1,21 +1,14 @@
 package me.guichaguri.tickratechanger;
 
 import java.io.File;
-import java.util.Map;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.IFMLCallHook;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import me.guichaguri.tickratechanger.mixin.MixinMinecraft;
-import me.guichaguri.tickratechanger.mixin.MixinMinecraftServer;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author Guilherme Chaguri
@@ -29,7 +22,7 @@ public class TickrateChanger {
     public static File CONFIG_FILE = null;
 
     public static final String MODID = "tastickratechanger";
-    public static final String VERSION = "Alpha";
+    public static final String VERSION = "Beta";
 
     public static final String GAME_RULE = "tickrate";
 
@@ -53,6 +46,10 @@ public class TickrateChanger {
     public static boolean INTERRUPT;
     // In tickrates below this value, the tickcounter will be shown in the console
     public static float TICKCOUNTERBOARDER = 2;
+    // Saves the tickrate for pausing
+    public static float TICKRATE_SAVED = 20;
+    // Sets a flag to advance 1 tick
+    public static boolean ADVANCE_TICK = false;
 
     public TickrateChanger() {
         INSTANCE = this;

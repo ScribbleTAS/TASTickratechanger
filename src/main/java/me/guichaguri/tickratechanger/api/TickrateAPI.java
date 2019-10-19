@@ -226,4 +226,28 @@ public class TickrateAPI {
             changeTickrate(tickrate, false);
         }
     }
+    public static void pauseUnpauseGame() {
+    	if(getClientTickrate()>0) {
+    		handlePausingGame(true);
+    	}
+    	else if (getClientTickrate()==0) {
+    		handlePausingGame(false);
+    	}
+    }
+    public static void handlePausingGame(boolean pause) {
+    	if (pause) {
+    		if(getClientTickrate()!=0) {
+    			TickrateChanger.TICKRATE_SAVED=getClientTickrate();
+    			changeTickrate(0);
+    		}
+    	}else {
+    		changeTickrate(TickrateChanger.TICKRATE_SAVED);
+    	}
+    }
+    public static void advanceTick() {
+    	if(getClientTickrate()==0) {
+    		TickrateChanger.ADVANCE_TICK=true;
+    		handlePausingGame(false);
+    	}
+    }
 }

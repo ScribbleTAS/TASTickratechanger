@@ -1,8 +1,22 @@
 package me.guichaguri.tickratechanger;
 
-import com.google.common.collect.ImmutableList;
+import static net.minecraft.util.text.TextFormatting.AQUA;
+import static net.minecraft.util.text.TextFormatting.BOLD;
+import static net.minecraft.util.text.TextFormatting.DARK_AQUA;
+import static net.minecraft.util.text.TextFormatting.DARK_PURPLE;
+import static net.minecraft.util.text.TextFormatting.DARK_RED;
+import static net.minecraft.util.text.TextFormatting.GRAY;
+import static net.minecraft.util.text.TextFormatting.GREEN;
+import static net.minecraft.util.text.TextFormatting.ITALIC;
+import static net.minecraft.util.text.TextFormatting.RED;
+import static net.minecraft.util.text.TextFormatting.WHITE;
+import static net.minecraft.util.text.TextFormatting.YELLOW;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 import me.guichaguri.tickratechanger.api.TickrateAPI;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -19,8 +33,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
 import net.minecraft.world.GameRules;
-
-import static net.minecraft.util.text.TextFormatting.*;
 
 /**
  * @author Guilherme Chaguri
