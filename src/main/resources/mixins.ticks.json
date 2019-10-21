@@ -1,7 +1,7 @@
 {
     "required": true,
     "minVersion": "0.7.10",
-    "package": "me.guichaguri.tickratechanger.mixin",
+    "package": "me.guichaguri.tastickratechanger.mixin",
     "refmap": "mixins.ticks.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [

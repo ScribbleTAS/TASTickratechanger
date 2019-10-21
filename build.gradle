@@ -20,7 +20,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
 version = "Beta"
-group = "me.guichaguri.tickratechanger"
+group = "me.guichaguri.tastickratechanger"
 archivesBaseName = "TASTickrateChanger-1.12"
 
 minecraft {
@@ -45,9 +45,8 @@ jar {
     from sourceSets.main.output
     classifier = 'deobf'
     manifest {
-        attributes 'FMLCorePlugin': 'me.guichaguri.tickratechanger.TickrateChanger',
-                   'FMLCorePluginContainsFMLMod': 'true',
-                   'FMLAT': 'tickratechanger_at.cfg',
+        attributes 'FMLCorePluginContainsFMLMod': 'true',
+                   'FMLAT': 'tastickratechanger_at.cfg',
                    'MixinConfigs': 'mixins.ticks.json',
                    'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                    'ForceLoadAsMod': 'true'
@@ -88,8 +87,8 @@ shadowJar {
     dependsOn reobfJar
 
     configurations = [project.configurations.compile]
-    relocate 'org.msgpack', 'me.guichaguri.tickratechanger.repack.org.msgpack'
-    relocate 'com.fasterxml', 'me.guichaguri.tickratechanger.repack.com.fasterxml'
+    relocate 'org.msgpack', 'me.guichaguri.tastickratechanger.repack.org.msgpack'
+    relocate 'com.fasterxml', 'me.guichaguri.tastickratechanger.repack.com.fasterxml'
     classifier "shadow"
     exclude 'dummyThing'
 
