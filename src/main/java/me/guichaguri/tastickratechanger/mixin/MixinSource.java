@@ -16,16 +16,8 @@ public abstract class MixinSource {
 	
 	@Inject(method=("setPitch"), at=@At("HEAD"), cancellable=true, remap=false)
 	  private void onGetPitch(float value, CallbackInfo ci){
-		if(TickrateChanger.CHANGE_SOUND) {
-			pitch=TickrateChanger.GAME_SPEED;
-		}else {
-			float newPitch = value;
-	        if( newPitch < 0.5f )
-	            newPitch = 0.5f;
-	        else if( newPitch > 2.0f )
-	            newPitch = 2.0f;
-			pitch=value;
-		}
+		if(TickrateChanger.CHANGE_SOUND) pitch=value*TickrateChanger.GAME_SPEED;
+		else pitch=value;
 		ci.cancel();
 	  }
 }
