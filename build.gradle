@@ -19,14 +19,15 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "Beta"
+version = "1.0"
 group = "me.guichaguri.tastickratechanger"
 archivesBaseName = "TASTickrateChanger-1.12"
 
 minecraft {
-    version = "1.12.2-14.23.0.2486"
+    version = "1.12-14.21.1.2443"
     runDir = "run"
     mappings = "snapshot_20170624"
+	replace '${version}':project.version,'${mcversion}':project.minecraft.version
 }
 configurations {
     bundled
