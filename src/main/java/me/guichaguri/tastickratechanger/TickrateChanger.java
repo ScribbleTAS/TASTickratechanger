@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Timer;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -50,6 +51,8 @@ public class TickrateChanger {
     public static float TICKRATE_SAVED = 20;
     // Sets a flag to advance 1 tick
     public static boolean ADVANCE_TICK = false;
+    // A new constant Timer that runs 60 ticks a second and is also affected by the tickratechanger
+    public static Timer TASTIMER= new Timer(TICKS_PER_SECOND*3);
 
     public TickrateChanger() {
         INSTANCE = this;
@@ -67,8 +70,10 @@ public class TickrateChanger {
         if(mc == null) return; // Wut
         if(tickrate>0) {
         	mc.timer.tickLength = 1000F / tickrate;
+        	TASTIMER.tickLength = 1000F / (tickrate*3);
         }else if(tickrate==0) {
         	mc.timer.tickLength=Float.MAX_VALUE;
+        	TASTIMER.tickLength=Float.MAX_VALUE;
         }
     }
 

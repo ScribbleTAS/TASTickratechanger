@@ -8,11 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import me.guichaguri.tastickratechanger.TASTickEvent;
 import me.guichaguri.tastickratechanger.TickrateChanger;
-import me.guichaguri.tastickratechanger.TickrateContainer;
-import me.guichaguri.tastickratechanger.api.TickrateAPI;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
+import net.minecraftforge.common.MinecraftForge;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -20,8 +19,13 @@ public abstract class MixinMinecraft {
 	@Shadow 
 	public abstract void runTickKeyboard();
 	
-	@Inject(method = "runGameLoop", at = @At(value="HEAD"),cancellable = true)
+	@Inject(method = "runGameLoop", at = @At(value="HEAD"))
 	private void processKeybind(CallbackInfo ci) {
+		TickrateChanger.TASTIMER.updateTimer();
+		for (int j = 0; j < Math.min(10, TickrateChanger.TASTIMER.elapsedTicks); ++j)
+        {
+            MinecraftForge.EVENT_BUS.post(new TASTickEvent());
+        }
 		if(TickrateChanger.TICKS_PER_SECOND==0) {
 			this.runTickKeyboard();
 		}
