@@ -23,7 +23,8 @@ public class TickrateChanger {
     public static File CONFIG_FILE = null;
 
     public static final String MODID = "tastickratechanger";
-    public static final String VERSION = "Beta";
+    public static final String VERSION = "${version}";
+	public static final String MCVERSION ="${mcversion}";
 
     public static final String GAME_RULE = "tickrate";
 
