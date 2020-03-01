@@ -23,7 +23,7 @@ public class TickrateMessageHandler implements IMessageHandler<TickrateMessage, 
 
         float tickrate = msg.getTickrate();
 
-        if(tickrate <= TickrateChanger.MIN_TICKRATE) {
+        if(tickrate < TickrateChanger.MIN_TICKRATE) {
             TickrateChanger.LOGGER.info("Tickrate forced to change from " + tickrate + " to " +
                                         TickrateChanger.MIN_TICKRATE + ", because the value is too low" +
                                         " (You can change the minimum tickrate in the config file)");

@@ -9,6 +9,9 @@ import java.util.concurrent.FutureTask;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.guichaguri.tastickratechanger.TickrateChanger;
 import net.minecraft.crash.CrashReport;
@@ -55,11 +58,12 @@ public abstract class MixinMinecraftServer {
 	@Shadow
 	private Queue < FutureTask<? >> futureTaskQueue;
 	@Shadow
-	private static Logger LOG;
+	private static Logger LOGGER;
 	
 	private static long msToTick;
 	
-	public void run() {
+	@Inject(method="run", at=@At("HEAD"), cancellable=true)
+	public void redoRun(CallbackInfo ci) {
 	 try
      {
          if (this.init())
@@ -78,14 +82,14 @@ public abstract class MixinMinecraftServer {
 
                  if (j > 2000L && this.currentTime - this.timeOfLastWarning >= 15000L)
                  {
-                     LOG.warn("Can't keep up! Did the system time change, or is the server overloaded? Running {}ms behind, skipping {} tick(s)", Long.valueOf(j), Long.valueOf(j / 50L));
+                     LOGGER.warn("Can't keep up! Did the system time change, or is the server overloaded? Running {}ms behind, skipping {} tick(s)", Long.valueOf(j), Long.valueOf(j / 50L));
                      j = 2000L;
                      this.timeOfLastWarning = this.currentTime;
                  }
 
                  if (j < 0L)
                  {
-                	 LOG.warn("Time ran backwards! Did the system time change?");
+                	 LOGGER.warn("Time ran backwards! Did the system time change?");
                      j = 0L;
                  }
 
@@ -117,7 +121,7 @@ public abstract class MixinMinecraftServer {
 					}
 					for (long o = 0; o < msToTick; o++) {
 						if (TickrateChanger.INTERRUPT) {
-							LOG.info("Interrupting " + o + " " + msToTick);
+							LOGGER.info("Interrupting " + o + " " + msToTick);
 							msToTick = 1L;
 							currentTime = System.currentTimeMillis();
 							TickrateChanger.INTERRUPT = false;
@@ -125,7 +129,7 @@ public abstract class MixinMinecraftServer {
 						synchronized (this.futureTaskQueue) {
 							while (!this.futureTaskQueue.isEmpty()) {
 								try {
-									LOG.debug("Processing Future Task Queue");
+									LOGGER.debug("Processing Future Task Queue");
 									((FutureTask) this.futureTaskQueue.poll()).run();
 								} catch (Throwable var9) {
 									var9.printStackTrace();
@@ -135,8 +139,8 @@ public abstract class MixinMinecraftServer {
 						try {
 							Thread.sleep(1L);
 						} catch (InterruptedException e) {
-							LOG.error("Thread.sleep in MixinMinecraft couldn't be processed!");
-							LOG.catching(e);
+							LOGGER.error("Thread.sleep in MixinMinecraft couldn't be processed!");
+							LOGGER.catching(e);
 						}
 					}
                  this.serverIsRunning = true;
@@ -157,7 +161,7 @@ public abstract class MixinMinecraftServer {
      }
      catch (Throwable throwable1)
      {
-         LOG.error("Encountered an unexpected exception", throwable1);
+         LOGGER.error("Encountered an unexpected exception", throwable1);
          CrashReport crashreport = null;
 
          if (throwable1 instanceof ReportedException)
@@ -173,11 +177,11 @@ public abstract class MixinMinecraftServer {
 
          if (crashreport.saveToFile(file1))
          {
-             LOG.error("This crash report has been saved to: {}", (Object)file1.getAbsolutePath());
+             LOGGER.error("This crash report has been saved to: {}", (Object)file1.getAbsolutePath());
          }
          else
          {
-        	 LOG.error("We were unable to save this crash report to disk.");
+        	 LOGGER.error("We were unable to save this crash report to disk.");
          }
 
          net.minecraftforge.fml.common.FMLCommonHandler.instance().expectServerStopped(); // has to come before finalTick to avoid race conditions
@@ -192,7 +196,7 @@ public abstract class MixinMinecraftServer {
          }
          catch (Throwable throwable)
          {
-             LOG.error("Exception stopping the server", throwable);
+             LOGGER.error("Exception stopping the server", throwable);
          }
          finally
          {
@@ -201,5 +205,6 @@ public abstract class MixinMinecraftServer {
              this.systemExitNow();
          }
      }
+	 ci.cancel();
 	}
 }

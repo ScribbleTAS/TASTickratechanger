@@ -9,6 +9,9 @@
     ],
     "client": [
 	   "MixinMinecraft",
-       "MixinSource"
+       "MixinSource",
+       "MixinRenderItem",
+       "MixinGuiSubtitleOverlay",
+       "MixinToastInstance"
     ]
 }
