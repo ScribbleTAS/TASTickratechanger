@@ -127,7 +127,6 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
                 	if(!guisubtitleoverlay$subtitle1.isOnce()) {
                     	guisubtitleoverlay$subtitle1.setPauseval(i2);
                     	guisubtitleoverlay$subtitle1.setOnce(true);
-                    	System.out.println(i2);
                 	}else {
                 		i2=guisubtitleoverlay$subtitle1.getPauseval();
                 	}
