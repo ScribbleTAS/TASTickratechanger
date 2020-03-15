@@ -33,24 +33,13 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
 	private List<MixinGuiSubtitleOverlay.Subtitle> subtitles;
 	
 	private boolean once=false;
-	private long save=0;
-	private long offset=0;
+	private float multipliersave=0;
 
 	@Inject(method="renderSubtitles", at= @At("HEAD"), cancellable= true)
 	public void redoRenderSubtitles(ScaledResolution resolution, CallbackInfo ci){
 		//Make a working multiplier
-		float multiplier;
 		if(TickrateChanger.TICKS_PER_SECOND!=0) {
-			multiplier=20/TickrateChanger.TICKS_PER_SECOND;
-			if(once==true) {
-				once=false;
-				offset=Minecraft.getSystemTime()-save;
-			}
-		}else {
-			multiplier=Float.MAX_VALUE;
-			if(once==false) {
-				save=Minecraft.getSystemTime();
-			}
+			multipliersave=20/TickrateChanger.TICKS_PER_SECOND;
 		}
 		
 		if (!this.enabled && this.client.gameSettings.showSubtitles)
@@ -80,8 +69,20 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
             while (iterator.hasNext())
             {
                 MixinGuiSubtitleOverlay.Subtitle guisubtitleoverlay$subtitle = iterator.next();
-
-                if ((guisubtitleoverlay$subtitle.getStartTime()+offset) + (3000L*multiplier) <= Minecraft.getSystemTime())
+                float multiplier;
+                if(TickrateChanger.TICKS_PER_SECOND!=0) {
+                	multiplier=multipliersave;
+                	if(guisubtitleoverlay$subtitle.isOnce()) {
+                    	guisubtitleoverlay$subtitle.setOffset();
+                    	guisubtitleoverlay$subtitle.setOnce(false);
+                	}
+                }else {
+                	multiplier=Float.MAX_VALUE;
+                	if(!guisubtitleoverlay$subtitle.isOnce()) {
+                		guisubtitleoverlay$subtitle.setSave();
+                	}
+                }
+                if (guisubtitleoverlay$subtitle.getStartTime() + (3000L*multiplier) <= (Minecraft.getSystemTime()-guisubtitleoverlay$subtitle.getOffset()))
                 {
                     iterator.remove();
                 }
@@ -92,7 +93,7 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
             }
 
             j = j + this.client.fontRenderer.getStringWidth("<") + this.client.fontRenderer.getStringWidth(" ") + this.client.fontRenderer.getStringWidth(">") + this.client.fontRenderer.getStringWidth(" ");
-
+            
             for (MixinGuiSubtitleOverlay.Subtitle guisubtitleoverlay$subtitle1 : this.subtitles)
             {
                 int k = 255;
@@ -106,14 +107,32 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
                 int j1 = i1 / 2;
                 float f = 1.0F;
                 int k1 = this.client.fontRenderer.getStringWidth(s);
-                int l1 = MathHelper.floor(MathHelper.clampedLerp(255.0D, 75.0D, (double)((float)(Minecraft.getSystemTime() - (guisubtitleoverlay$subtitle1.getStartTime()+offset)) / (3000.0F*multiplier))));
+                if(TickrateChanger.TICKS_PER_SECOND!=0) {
+                	if(guisubtitleoverlay$subtitle1.isOnce()) {
+                    	guisubtitleoverlay$subtitle1.setOffset();
+                    	guisubtitleoverlay$subtitle1.setOnce(false);
+                	}
+                }else {
+                	if(!guisubtitleoverlay$subtitle1.isOnce()) {
+                		guisubtitleoverlay$subtitle1.setSave();
+                	}
+                }
+                int l1 = MathHelper.floor(MathHelper.clampedLerp(255.0D, 75.0D, (double)((float)((Minecraft.getSystemTime()-guisubtitleoverlay$subtitle1.getOffset()) - guisubtitleoverlay$subtitle1.getStartTime()) / (3000.0F*multipliersave))));
                 int i2 = l1 << 16 | l1 << 8 | l1;
                 GlStateManager.pushMatrix();
                 GlStateManager.translate((float)resolution.getScaledWidth() - (float)l * 1.0F - 2.0F, (float)(resolution.getScaledHeight() - 30) - (float)(i * (i1 + 1)) * 1.0F, 0.0F);
                 GlStateManager.scale(1.0F, 1.0F, 1.0F);
                 drawRect(-l - 1, -j1 - 1, l + 1, j1 + 1, -872415232);
+                if(TickrateChanger.TICKS_PER_SECOND==0) {
+                	if(!guisubtitleoverlay$subtitle1.isOnce()) {
+                    	guisubtitleoverlay$subtitle1.setPauseval(i2);
+                    	guisubtitleoverlay$subtitle1.setOnce(true);
+                    	System.out.println(i2);
+                	}else {
+                		i2=guisubtitleoverlay$subtitle1.getPauseval();
+                	}
+                }
                 GlStateManager.enableBlend();
-
                 if (!flag)
                 {
                     if (d0 > 0.0D)
@@ -164,11 +183,18 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
 		private final String subtitle;
 		private long startTime;
 		private Vec3d location;
+		private int pauseval;
+		private long offset;
+		private long save;
+		private boolean once;
 
 		public Subtitle(String subtitleIn, Vec3d locationIn) {
 			this.subtitle = subtitleIn;
 			this.location = locationIn;
-			this.startTime = Minecraft.getSystemTime();
+			this.offset=0;
+			this.save=0;
+			this.startTime = Minecraft.getSystemTime()-offset;
+			this.once=false;
 		}
 
 		public String getString() {
@@ -185,7 +211,31 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
 
 		public void refresh(Vec3d locationIn) {
 			this.location = locationIn;
-			this.startTime = Minecraft.getSystemTime();
+			this.startTime = Minecraft.getSystemTime()-offset;
+		}
+		public void setPauseval(int val) {
+			this.pauseval=val;
+		}
+		public int getPauseval() {
+			return pauseval;
+		}
+		public void setOffset() {
+			this.offset=Minecraft.getSystemTime()-save;
+		}
+		public long getOffset() {
+			return this.offset;
+		}
+		public void setSave() {
+			this.save = Minecraft.getSystemTime()-offset;
+		}
+		public long getSave() {
+			return save;
+		}
+		public void setOnce(boolean once) {
+			this.once = once;
+		}
+		public boolean isOnce() {
+			return once;
 		}
 	}
 }

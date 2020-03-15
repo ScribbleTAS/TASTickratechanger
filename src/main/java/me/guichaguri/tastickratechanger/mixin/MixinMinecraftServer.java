@@ -121,7 +121,7 @@ public abstract class MixinMinecraftServer {
 					}
 					for (long o = 0; o < msToTick; o++) {
 						if (TickrateChanger.INTERRUPT) {
-							LOGGER.info("Interrupting " + o + " " + msToTick);
+							LOGGER.debug("Interrupting " + o + " " + msToTick);
 							msToTick = 1L;
 							currentTime = System.currentTimeMillis();
 							TickrateChanger.INTERRUPT = false;
