@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.google.common.collect.Lists;
+
 import me.guichaguri.tastickratechanger.TickrateChanger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -30,11 +32,25 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
 	@Shadow
 	private Minecraft client;
 	
-	private List<MixinGuiSubtitleOverlay.Subtitle> subtitles;
+	private List<MixinGuiSubtitleOverlay.Subtitle> subtitles=Lists.<MixinGuiSubtitleOverlay.Subtitle>newArrayList();
 	
 	private boolean once=false;
 	private float multipliersave=0;
 
+	/**
+	 * This was one of the weirdest things to modify while keeping very close to vanilla<br>
+	 * <br>
+	 * What essentially happens is when a sound plays, a subtitle is created in playSound(). After a while the color of the text darkens until the subtitle disappears <br>
+	 * Just like the RenderItem and GuiToast stuff, Minecraft.getSystemTime is used.<br>
+	 * <br>
+	 * To make it work with the tickratechanger, you just have to multiply the 3000L with the current gamespeed, which is 20/tickrate and watch out that you don't set tickrate to 0<br>
+	 * <br>
+	 * Again, making tickrate 0 work is a bit more difficult... An offset is used to still use the Minecraft.getSystemTime... And when it's tickrate 0 it saves the current value and applies it continuesly<br>
+	 * <br>
+	 * And to make that work for every sybtitle on screen there is the custom class Subtitles which holds more values than the vanilla Subtitles... <br>
+	 * <br>
+	 * If I look at this in half a year I will have no idea what I was doing...
+	 */
 	@Inject(method="renderSubtitles", at= @At("HEAD"), cancellable= true)
 	public void redoRenderSubtitles(ScaledResolution resolution, CallbackInfo ci){
 		//Make a working multiplier
@@ -69,6 +85,7 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
             while (iterator.hasNext())
             {
                 MixinGuiSubtitleOverlay.Subtitle guisubtitleoverlay$subtitle = iterator.next();
+                //Set and reset offset and multiplier
                 float multiplier;
                 if(TickrateChanger.TICKS_PER_SECOND!=0) {
                 	multiplier=multipliersave;
@@ -82,6 +99,7 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
                 		guisubtitleoverlay$subtitle.setSave();
                 	}
                 }
+                //Time until the subtitle disappears is altered here. The default is 3000L
                 if (guisubtitleoverlay$subtitle.getStartTime() + (3000L*multiplier) <= (Minecraft.getSystemTime()-guisubtitleoverlay$subtitle.getOffset()))
                 {
                     iterator.remove();
@@ -113,7 +131,7 @@ public class MixinGuiSubtitleOverlay extends Gui implements ISoundEventListener{
                     	guisubtitleoverlay$subtitle1.setOnce(false);
                 	}
                 }else {
-                	if(!guisubtitleoverlay$subtitle1.isOnce()) {
+                	if(!guisubtitleoverlay$subtitle1.isOnce()) {	//Executed when the tickrate is 0
                 		guisubtitleoverlay$subtitle1.setSave();
                 	}
                 }
