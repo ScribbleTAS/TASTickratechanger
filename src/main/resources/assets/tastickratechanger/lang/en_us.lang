@@ -28,6 +28,8 @@ tickratechanger.cmd.server.success=Server tickrate successfully changed to %d
 tickratechanger.cmd.player.success=%s's client tickrate successfully changed to %d
 tickratechanger.cmd.default.success=Default tickrate successfully changed to %d
 tickratechanger.cmd.map.success=Map tickrate successfully changed to %d
+#Added in TASTickratechanger
+tickratechanger.cmd.everything.nope=No negative tickrates, changing to 0
 
 tickratechanger.keybinding.5=Tickrate 5
 tickratechanger.keybinding.10=Tickrate 10

@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import me.guichaguri.tastickratechanger.TickrateMessageHandler.TickrateMessage;
 import me.guichaguri.tastickratechanger.api.TickrateAPI;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
@@ -58,7 +59,7 @@ public class TickrateContainer {
 
         TickrateChanger.CONFIG_FILE = event.getSuggestedConfigurationFile();
         Configuration cfg = new Configuration(TickrateChanger.CONFIG_FILE);
-        TickrateChanger.DEFAULT_TICKRATE = (float)cfg.get("default", "tickrate", 20.0,
+        float defticks = (float)cfg.get("default", "tickrate", 20.0,
                 "Default tickrate. The game will always initialize with this value.").getDouble(20);
         TickrateChanger.MIN_TICKRATE = (float)cfg.get("minimum", "tickrate", 0,
                 "Minimum tickrate from servers. Prevents really low tickrate values.").getDouble(0);
@@ -68,6 +69,16 @@ public class TickrateContainer {
         //Added in TASTickratechanger
         TickrateChanger.TICKCOUNTERBOARDER = (float) cfg.get("tickcounter", "tickrate", 2.0,
         		"In Tickrates below this value, a Tickcounter will be displayed in the console.").getDouble(2);
+        //Also added to prevent people initialising the game with tickrate 0
+        if(defticks>0) {
+        	TickrateChanger.DEFAULT_TICKRATE=defticks;
+        }else {
+        	TickrateChanger.LOGGER.warn("Cannot set the default tickrate to "+defticks+" or major issues arise! Fixing it in the config and setting the default to 20");
+        	TickrateChanger.DEFAULT_TICKRATE=20;
+        	cfg.get("default", "tickrate", 20.0,
+                    "Default tickrate. The game will always initialize with this value.").set(20.0);
+        	cfg.save();
+        }
         
         TickrateChanger.SHOW_MESSAGES = cfg.get("miscellaneous", "show-messages", true,
                 "Whether it will show log messages in the console and the game").getBoolean(true);
@@ -95,9 +106,9 @@ public class TickrateContainer {
 	            ClientRegistry.registerKeyBinding(KEY_60);
 	            ClientRegistry.registerKeyBinding(KEY_100);
 	        }
-	        	KEY_PAUSE = new KeyBinding("Pause Key", Keyboard.KEY_O, "key.categories.misc");
-	        	KEY_ADVANCE = new KeyBinding("TickAdvance Key", Keyboard.KEY_P, "key.categories.misc");
-	        	KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "key.categories.misc");
+	        	KEY_PAUSE = new KeyBinding("Pause Key", Keyboard.KEY_O, "TASTickratechanger");
+	        	KEY_ADVANCE = new KeyBinding("TickAdvance Key", Keyboard.KEY_P, "TASTickratechanger");
+	        	KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "TASTickratechanger");
 	        	ClientRegistry.registerKeyBinding(KEY_PAUSE);
 	        	ClientRegistry.registerKeyBinding(KEY_ADVANCE);
 	        	ClientRegistry.registerKeyBinding(KEY_CLOSEGUIS);
@@ -195,44 +206,44 @@ public class TickrateContainer {
 
     @SubscribeEvent
     public void key(KeyInputEvent event) {
-    	
-    	if(KEY_PAUSE.isPressed()) {
-    		TickrateAPI.pauseUnpauseGame();
-    	}
-    	if(KEY_ADVANCE.isPressed()) {
-    		TickrateAPI.advanceTick();
-    	}
-    	if(KEY_CLOSEGUIS.isPressed()) {
-    		if(TickrateAPI.getClientTickrate()==0){
-    			Minecraft.getMinecraft().displayGuiScreen(null);
-    		}
-    	}
-        if(!KEYS_AVAILABLE) return;
+		if (KEY_PAUSE.isPressed()) {
+			TickrateAPI.pauseUnpauseGame();
+		}
+		if (KEY_ADVANCE.isPressed()) {
+			TickrateAPI.advanceTick();
+		}
+		if (KEY_CLOSEGUIS.isPressed()) {
+			if (TickrateAPI.getClientTickrate() == 0) {
+				Minecraft.getMinecraft().displayGuiScreen(null);
+			}
+		}
+		if (!KEYS_AVAILABLE)
+			return;
 
-        float tickrate;
-        if(KEY_5.isPressed()) {
-            tickrate = 5;
-        } else if(KEY_10.isPressed()) {
-            tickrate = 10;
-        } else if(KEY_15.isPressed()) {
-            tickrate = 15;
-        } else if(KEY_20.isPressed()) {
-            tickrate = 20;
-        } else if(KEY_40.isPressed()) {
-            tickrate = 40;
-        } else if(KEY_60.isPressed()) {
-            tickrate = 60;
-        } else if(KEY_100.isPressed()) {
-            tickrate = 100;
-        } else {
-            return;
-        }
+		float tickrate;
+		if (KEY_5.isPressed()) {
+			tickrate = 5;
+		} else if (KEY_10.isPressed()) {
+			tickrate = 10;
+		} else if (KEY_15.isPressed()) {
+			tickrate = 15;
+		} else if (KEY_20.isPressed()) {
+			tickrate = 20;
+		} else if (KEY_40.isPressed()) {
+			tickrate = 40;
+		} else if (KEY_60.isPressed()) {
+			tickrate = 60;
+		} else if (KEY_100.isPressed()) {
+			tickrate = 100;
+		} else {
+			return;
+		}
 
-        // Cooldown. 0.1 real life second to prevent spam
-        if(lastKeyInputTime > Minecraft.getSystemTime() - 100) return;
-        lastKeyInputTime = Minecraft.getSystemTime();
+		// Cooldown. 0.1 real life second to prevent spam
+		if (lastKeyInputTime > Minecraft.getSystemTime() - 100)
+			return;
+		lastKeyInputTime = Minecraft.getSystemTime();
 
-        TickrateChanger.NETWORK.sendToServer(new TickrateMessage(tickrate));
-    }
-
+		TickrateChanger.NETWORK.sendToServer(new TickrateMessage(tickrate));
+	}
 }

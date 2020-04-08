@@ -132,10 +132,16 @@ public class TickrateCommand extends CommandBase {
             return;
         } else if((args[0].equalsIgnoreCase("setdefault")) && (args.length > 1)) {
             // Set default tickrate
+        	if(Integer.parseInt(args[1])<=0) {
+        		throw new CommandException("Can't set the default tickrate to "+args[1]+" or major issues arise!", new Object());
+        	}
             cmdSetDefault(sender, args);
             return;
         } else if((args[0].equalsIgnoreCase("setmap")) && (args.length > 1)) {
             // Set map tickrate
+        	if(Integer.parseInt(args[1])<=0) {
+        		throw new CommandException("Can't set the map tickrate to "+args[1]+" or major issues arise!", new Object());
+        	}
             cmdSetMap(sender, args);
             return;
         }
@@ -156,7 +162,11 @@ public class TickrateCommand extends CommandBase {
             TickrateAPI.changeTickrate(ticksPerSecond);
 
             if(TickrateChanger.SHOW_MESSAGES) {
-                chat(sender, t("tickratechanger.cmd.everything.success", GREEN, ticksPerSecond));
+            	if(ticksPerSecond>=0) {
+            		chat(sender, t("tickratechanger.cmd.everything.success", GREEN, ticksPerSecond));
+            	}else {
+            		chat(sender, t("tickratechanger.cmd.everything.nope", RED, ticksPerSecond));
+            	}
             }
 
         } else if(args[1].equalsIgnoreCase("client")) {
@@ -164,18 +174,26 @@ public class TickrateCommand extends CommandBase {
             // Set client tickrate
             TickrateAPI.changeClientTickrate(ticksPerSecond);
 
-            if(TickrateChanger.SHOW_MESSAGES) {
-                chat(sender, t("tickratechanger.cmd.client.success", GREEN, ticksPerSecond));
-            }
+			if (TickrateChanger.SHOW_MESSAGES) {
+				if (ticksPerSecond >= 0) {
+					chat(sender, t("tickratechanger.cmd.client.success", GREEN, ticksPerSecond));
+				} else {
+					chat(sender, t("tickratechanger.cmd.everything.nope", RED, ticksPerSecond));
+				}
+			}
 
         } else if(args[1].equalsIgnoreCase("server")) {
 
             // Set server tickrate
             TickrateAPI.changeServerTickrate(ticksPerSecond);
 
-            if(TickrateChanger.SHOW_MESSAGES) {
-                chat(sender, t("tickratechanger.cmd.server.success", GREEN, ticksPerSecond));
-            }
+			if (TickrateChanger.SHOW_MESSAGES) {
+				if (ticksPerSecond >= 0) {
+					chat(sender, t("tickratechanger.cmd.server.success", GREEN, ticksPerSecond));
+				} else {
+					chat(sender, t("tickratechanger.cmd.everything.nope", RED, ticksPerSecond));
+				}
+			}
 
         } else {
 
@@ -188,10 +206,14 @@ public class TickrateCommand extends CommandBase {
 
             TickrateAPI.changeClientTickrate(p, ticksPerSecond);
 
-            if(TickrateChanger.SHOW_MESSAGES) {
-                chat(sender, t("tickratechanger.cmd.player.success", GREEN, p.getDisplayNameString(), ticksPerSecond));
-            }
-
+			if (TickrateChanger.SHOW_MESSAGES) {
+				if (ticksPerSecond >= 0) {
+					chat(sender,
+							t("tickratechanger.cmd.player.success", GREEN, p.getDisplayNameString(), ticksPerSecond));
+				} else {
+					chat(sender, t("tickratechanger.cmd.everything.nope", RED, ticksPerSecond));
+				}
+			}
         }
     }
 

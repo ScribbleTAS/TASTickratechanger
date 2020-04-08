@@ -3,6 +3,8 @@ package me.guichaguri.tastickratechanger;
 import me.guichaguri.tastickratechanger.api.TickrateAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -26,9 +28,15 @@ private int tickcount=0;
 			}
 			
 			if(TickrateChanger.ADVANCE_TICK) {
-				TickrateAPI.handlePausingGame(true);
 				TickrateChanger.ADVANCE_TICK=false;
+				TickrateAPI.handlePausingGame(true);
 			}
+		}
+	}
+	@SubscribeEvent
+	public void onMenu(GuiOpenEvent ev) {
+		if(ev.getGui() instanceof GuiMainMenu) {
+			TickrateChanger.WASZERO=false;
 		}
 	}
 }

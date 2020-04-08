@@ -50,7 +50,8 @@ public abstract class MixinGuiToast{
 	 * <br>
 	 * There is one compromise I had to make... When you change the tickrate while a toast is showing, it will stay at the old tickrate until it's done...<br>
 	 * Maybe I still fix this and get into this mess once more, but for now this will do and don't make the subtitles stuck in a loop until you change to the old tickrate<br>
-     * Am I doing this right with commenting code? I hope so...
+     * Am I doing this right with commenting code? I hope so...<br>
+     * @author ScribbleLP
 	 */
 	@Inject(method="drawToast", at=@At("HEAD"), cancellable=true)
 	public void redoDrawToast(ScaledResolution resolution, CallbackInfo ci)

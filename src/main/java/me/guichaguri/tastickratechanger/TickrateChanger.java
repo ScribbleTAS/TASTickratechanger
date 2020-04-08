@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TickrateChanger {
 
     public static TickrateChanger INSTANCE;
-    public static Logger LOGGER = LogManager.getLogger("Tickrate Changer");
+    public static Logger LOGGER = LogManager.getLogger("TASTickrate Changer");
     public static SimpleNetworkWrapper NETWORK;
     public static TickrateCommand COMMAND = null;
     public static File CONFIG_FILE = null;
@@ -54,6 +54,8 @@ public class TickrateChanger {
     public static boolean ADVANCE_TICK = false;
     // A new constant Timer that runs 60 ticks a second and is also affected by the tickratechanger
     public static Timer TASTIMER= new Timer(TICKS_PER_SECOND*3);
+    //Used to check if the pause screen is up
+    public static boolean WASZERO=false;
 
     public TickrateChanger() {
         INSTANCE = this;
@@ -62,7 +64,11 @@ public class TickrateChanger {
 
     @SideOnly(Side.CLIENT)
     public void updateClientTickrate(float tickrate, boolean log) {
-        if(log) LOGGER.info("Updating client tickrate to " + tickrate);
+    	if(TickrateChanger.ADVANCE_TICK) {
+    		if(log) LOGGER.info("Advancing one tick");
+    	}else {
+    		if(log) LOGGER.info("Updating client tickrate to " + tickrate);
+    	}
 
         TICKS_PER_SECOND = tickrate;
         if(CHANGE_SOUND) GAME_SPEED = tickrate / 20F;
@@ -75,6 +81,7 @@ public class TickrateChanger {
         }else if(tickrate==0) {
         	mc.timer.tickLength=Float.MAX_VALUE;
         	TASTIMER.tickLength=Float.MAX_VALUE;
+        	Minecraft.getMinecraft().getSoundHandler().pauseSounds();
         }
     }
 

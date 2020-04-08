@@ -2,14 +2,14 @@
 {
   "modid": "tastickratechanger",
   "name": "TAS Tickrate Changer",
-  "description": "Let you change the client/server tickrate",
+  "description": "Let you change the client/server tickrate, merging the Tickratechanger with some features of Cubitect's Cubitick Mod, fixing many issues in the process",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "http://guichaguri.github.io/TickrateChanger/",
   "updateUrl": "",
   "authorList": ["Guichaguri, Cubitect, famous1622, ScribbleLP"],
-  "credits": "Merging the Tickratechanger with some features of Cubitect's Cubitick Mod...",
-  "logoFile": "",
+  "credits": "Original Mod by Guichaguri, code for tickrate 0 by Cubitect, brought to you to forge by ScribbleLP with the help of famous1622",
+  "logoFile": "assets/tastickratechanger/textures/potiontickrate.png",
   "screenshots": [],
   "dependencies": []
 }

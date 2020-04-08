@@ -61,7 +61,20 @@ public abstract class MixinMinecraftServer {
 	private static Logger LOGGER;
 	
 	private static long msToTick;
-	
+	/**
+	 * This mixin changes the ticking behaviour of minecraft servers.<br>
+	 * The way this is usually done is set the Thread.sleep from 50 Milliseconds to your desired tickrate in milliseconds<br>
+	 * Not the best course of action if you try to implement tickrate 0, which is setting the milliseconds per tick to Long.MAX_VALUE...<br>
+	 * Yes indeed, this freezes the server entirely, but there is also no way to unfreeze the server... <br>
+	 * <br>
+	 * To fix this, there is a for loop with a Thread.sleep(1L). The for loop runs for the desired milliseconds to tick and can also be interrupted.<br>
+	 * And the future task queue is also still being processed while in tickrate 0.<br>
+	 * <br>
+	 * Original author of the tickrate 0 mod is Cubitect. He demonstrated this mod in mcp and uploaded the changes here {@link https://github.com/Cubitect/Cubitick}
+	 * @param ci
+	 * 
+	 * @author Cubitect, ScribbleLP
+	 */
 	@Inject(method="run", at=@At("HEAD"), cancellable=true)
 	public void redoRun(CallbackInfo ci) {
 	 try
