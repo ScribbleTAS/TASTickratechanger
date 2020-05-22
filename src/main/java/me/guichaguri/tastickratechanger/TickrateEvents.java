@@ -26,7 +26,11 @@ private int tickcount=0;
 			}else if((FMLCommonHandler.instance().getMinecraftServerInstance()==null||TickrateAPI.getClientTickrate()>TickrateChanger.TICKCOUNTERBOARDER)&&tickcount!=0) {
 				tickcount=0;
 			}
-			
+			if (TickrateContainer.KEY_CLOSEGUIS.isPressed()) {
+				if (TickrateAPI.getClientTickrate() != 0) {
+					Minecraft.getMinecraft().displayGuiScreen(null);
+				}
+			}
 			if(TickrateChanger.ADVANCE_TICK) {
 				TickrateChanger.ADVANCE_TICK=false;
 				TickrateAPI.handlePausingGame(true);

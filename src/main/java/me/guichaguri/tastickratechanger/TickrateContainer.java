@@ -212,11 +212,7 @@ public class TickrateContainer {
 		if (KEY_ADVANCE.isPressed()) {
 			TickrateAPI.advanceTick();
 		}
-		if (KEY_CLOSEGUIS.isPressed()) {
-			if (TickrateAPI.getClientTickrate() == 0) {
-				Minecraft.getMinecraft().displayGuiScreen(null);
-			}
-		}
+		
 		if (!KEYS_AVAILABLE)
 			return;
 

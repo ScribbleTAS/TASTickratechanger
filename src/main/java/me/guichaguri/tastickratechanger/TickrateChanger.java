@@ -81,7 +81,6 @@ public class TickrateChanger {
         }else if(tickrate==0) {
         	mc.timer.tickLength=Float.MAX_VALUE;
         	TASTIMER.tickLength=Float.MAX_VALUE;
-        	Minecraft.getMinecraft().getSoundHandler().pauseSounds();
         }
     }
 

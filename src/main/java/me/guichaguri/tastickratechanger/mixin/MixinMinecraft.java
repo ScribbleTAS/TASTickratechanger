@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.guichaguri.tastickratechanger.TASTickEvent;
 import me.guichaguri.tastickratechanger.TickrateChanger;
+import me.guichaguri.tastickratechanger.TickrateContainer;
 import me.guichaguri.tastickratechanger.api.TickrateAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
@@ -64,16 +65,15 @@ public abstract class MixinMinecraft {
             MinecraftForge.EVENT_BUS.post(new TASTickEvent());
         }
 		if(TickrateChanger.TICKS_PER_SECOND==0) {
-			TickrateChanger.WASZERO=true;
-			//this.mcSoundHandler.pauseSounds();
 			runTickKeyboard();
+			TickrateChanger.WASZERO=true;
+			this.mcSoundHandler.pauseSounds();
 		}
 	}
 	@Inject(method = "runGameLoop", at = @At(value="RETURN"))
 	private void redoRunGameLoopReturn(CallbackInfo ci) {
 		if(TickrateChanger.WASZERO&&TickrateChanger.TICKS_PER_SECOND!=0) {
 			this.mcSoundHandler.resumeSounds();
-			System.out.println("Heck");
 		}
 		if(TickrateChanger.WASZERO&&TickrateChanger.TICKS_PER_SECOND!=0&&currentScreen==null) {
 			TickrateChanger.WASZERO=false;
@@ -130,6 +130,7 @@ public abstract class MixinMinecraft {
     {
     	if(TickrateChanger.TICKS_PER_SECOND!=0) {
     		if(TickrateChanger.ADVANCE_TICK==false) {
+    			/*+++++++++++++++++++++++++++++ VANILLA SECTION +++++++++++++++++++++++++++++*/
 		        for (; this.gameSettings.keyBindTogglePerspective.isPressed(); this.renderGlobal.setDisplayListEntitiesDirty())
 		        {
 		            ++this.gameSettings.thirdPersonView;
@@ -221,10 +222,14 @@ public abstract class MixinMinecraft {
 		            }
 		        }
     		}
+    		/*====================================== END OF VANILLA SECTION ======================================*/
+    		/*++++++++++++ Changes Tickrate to 0 after the Ingame Menu sets it to 20 +++++++++++++++*/
 			if(!(currentScreen instanceof GuiIngameMenu)&&TickrateChanger.WASZERO==true) {
 				TickrateAPI.changeClientTickrate(0,false);
 			}
+			/*=====================================================================================*/
 		} else {
+			/*+++++++++++++++++Fixing issue: After sending a chat message, keybinds get executed +++++++++++++++++*/
 			if (!(this.currentScreen instanceof GuiChat)) {
 				boolean flag2 = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
 				if (flag2) {
@@ -241,6 +246,9 @@ public abstract class MixinMinecraft {
 					x.pressTime=0;
 				}
 			}
+			/*========================================================================================================*/
+			/*++++++++++++++++++++++++++++++ When the Tickadvance Key is pressed +++++++++++++++++++++++++++++++
+			 * 						(Fixes an issue, so the inventory isn't open in tickrate 0)					*/
 			if(TickrateChanger.ADVANCE_TICK==true) {
 				for (; this.gameSettings.keyBindTogglePerspective.isPressed(); this.renderGlobal.setDisplayListEntitiesDirty())
 		        {
@@ -287,8 +295,9 @@ public abstract class MixinMinecraft {
 		                }
 		            }
 		        }
-		        while (this.gameSettings.keyBindInventory.isPressed())
+		        if (this.gameSettings.keyBindInventory.isPressed())
 		        {
+		        	if(currentScreen == null) {
 		            if (this.playerController.isRidingHorse())
 		            {
 		                this.player.sendHorseInventory();
@@ -298,6 +307,10 @@ public abstract class MixinMinecraft {
 		                this.tutorial.openInventory();
 		                this.displayGuiScreen(new GuiInventory(this.player));
 		            }
+		        	}else {
+		        		this.gameSettings.keyBindInventory.pressTime=0;
+		        		displayGuiScreen(null);
+		        	}
 		        }
 		        while (this.gameSettings.keyBindAdvancements.isPressed())
 		        {
@@ -333,6 +346,7 @@ public abstract class MixinMinecraft {
 		            }
 		        }
 			}
+			/*Changes client Tickrate to 20 when the IngameMenu is open, to be able to close the game*/
 			if(currentScreen instanceof GuiIngameMenu) {
 				TickrateAPI.changeClientTickrate(20,false);
 			}
