@@ -12,6 +12,7 @@
        "MixinSource",
        "MixinRenderItem",
        "MixinGuiSubtitleOverlay",
-       "MixinGuiToast"
+       "MixinGuiToast",
+	   "MixinGuiContainer"
     ]
 }

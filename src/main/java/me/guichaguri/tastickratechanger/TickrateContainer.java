@@ -49,7 +49,7 @@ public class TickrateContainer {
     
     public static KeyBinding KEY_PAUSE=null;
     public static KeyBinding KEY_ADVANCE=null;
-    public static KeyBinding KEY_CLOSEGUIS=null;
+    //public static KeyBinding KEY_CLOSEGUIS=null;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -108,10 +108,10 @@ public class TickrateContainer {
 	        }
 	        	KEY_PAUSE = new KeyBinding("Pause Key", Keyboard.KEY_O, "TASTickratechanger");
 	        	KEY_ADVANCE = new KeyBinding("TickAdvance Key", Keyboard.KEY_P, "TASTickratechanger");
-	        	KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "TASTickratechanger");
+	        	//KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "TASTickratechanger");
 	        	ClientRegistry.registerKeyBinding(KEY_PAUSE);
 	        	ClientRegistry.registerKeyBinding(KEY_ADVANCE);
-	        	ClientRegistry.registerKeyBinding(KEY_CLOSEGUIS);
+	        	//ClientRegistry.registerKeyBinding(KEY_CLOSEGUIS);
         }
         cfg.save();
     }
@@ -206,13 +206,12 @@ public class TickrateContainer {
 
     @SubscribeEvent
     public void key(KeyInputEvent event) {
-		if (KEY_PAUSE.isPressed()) {
+		/*if (KEY_PAUSE.isPressed()) {
 			TickrateAPI.pauseUnpauseGame();
 		}
 		if (KEY_ADVANCE.isPressed()) {
 			TickrateAPI.advanceTick();
-		}
-		
+		}*/
 		if (!KEYS_AVAILABLE)
 			return;
 

@@ -152,7 +152,7 @@ public abstract class MixinMinecraftServer {
 						try {
 							Thread.sleep(1L);
 						} catch (InterruptedException e) {
-							LOGGER.error("Thread.sleep in MixinMinecraft couldn't be processed!");
+							LOGGER.error("Thread.sleep in MixinMinecraftServer couldn't be processed!");
 							LOGGER.catching(e);
 						}
 					}
