@@ -47,8 +47,11 @@ public class TickrateContainer {
     public static KeyBinding KEY_60 = null;
     public static KeyBinding KEY_100 = null;
     
-    public static KeyBinding KEY_PAUSE=null;
-    public static KeyBinding KEY_ADVANCE=null;
+    public static int KEYCODE_PAUSE_KEY=Keyboard.KEY_F9;
+    public static int KEYCODE_ADVANCE_KEY=Keyboard.KEY_F10;
+    public static int COOLDOWN_PAUSE_KEY=0;
+    public static int COOLDOWN_ADVANCE_KEY=0;
+    
     //public static KeyBinding KEY_CLOSEGUIS=null;
     
     @EventHandler
@@ -69,6 +72,8 @@ public class TickrateContainer {
         //Added in TASTickratechanger
         TickrateChanger.TICKCOUNTERBOARDER = (float) cfg.get("tickcounter", "tickrate", 2.0,
         		"In Tickrates below this value, a Tickcounter will be displayed in the console.").getDouble(2);
+        KEYCODE_PAUSE_KEY= cfg.get("Keybindings", "keycodePauseKey", Keyboard.KEY_F9, "Keycode for the Pause Key, default is F9, look up the keycode for the Keyboardkey you want").getInt();
+        KEYCODE_ADVANCE_KEY= cfg.get("Keybindings", "keycodeAdvanceKey", Keyboard.KEY_F10, "Keycode for the Pause Key, default is F10, look up the keycode for the Keyboardkey you want").getInt();
         //Also added to prevent people initialising the game with tickrate 0
         if(defticks>0) {
         	TickrateChanger.DEFAULT_TICKRATE=defticks;
@@ -106,12 +111,6 @@ public class TickrateContainer {
 	            ClientRegistry.registerKeyBinding(KEY_60);
 	            ClientRegistry.registerKeyBinding(KEY_100);
 	        }
-	        	KEY_PAUSE = new KeyBinding("Pause Key", Keyboard.KEY_O, "TASTickratechanger");
-	        	KEY_ADVANCE = new KeyBinding("TickAdvance Key", Keyboard.KEY_P, "TASTickratechanger");
-	        	//KEY_CLOSEGUIS = new KeyBinding("CloseGui Key", Keyboard.KEY_U, "TASTickratechanger");
-	        	ClientRegistry.registerKeyBinding(KEY_PAUSE);
-	        	ClientRegistry.registerKeyBinding(KEY_ADVANCE);
-	        	//ClientRegistry.registerKeyBinding(KEY_CLOSEGUIS);
         }
         cfg.save();
     }
@@ -206,12 +205,6 @@ public class TickrateContainer {
 
     @SubscribeEvent
     public void key(KeyInputEvent event) {
-		/*if (KEY_PAUSE.isPressed()) {
-			TickrateAPI.pauseUnpauseGame();
-		}
-		if (KEY_ADVANCE.isPressed()) {
-			TickrateAPI.advanceTick();
-		}*/
 		if (!KEYS_AVAILABLE)
 			return;
 

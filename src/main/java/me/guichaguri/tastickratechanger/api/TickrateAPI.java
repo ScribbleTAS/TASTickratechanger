@@ -229,17 +229,17 @@ public class TickrateAPI {
         }
     }
     public static void pauseUnpauseGame() {
-    	if(getClientTickrate()>0) {
+    	if(TickrateChanger.TICKS_PER_SECOND>0) {
     		handlePausingGame(true);
     	}
-    	else if (getClientTickrate()==0) {
+    	else if (TickrateChanger.TICKS_PER_SECOND==0) {
     		handlePausingGame(false);
     	}
     }
     public static void handlePausingGame(boolean pause) {
     	if (pause) {
     		if(getClientTickrate()!=0) {
-    			TickrateChanger.TICKRATE_SAVED=getClientTickrate();
+    			TickrateChanger.TICKRATE_SAVED=TickrateChanger.TICKS_PER_SECOND;
     			changeTickrate(0);
     		}
     	}else {

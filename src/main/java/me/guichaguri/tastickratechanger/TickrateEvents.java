@@ -30,11 +30,11 @@ private int tickcount=0;
 				if (TickrateAPI.getClientTickrate() != 0) {
 					Minecraft.getMinecraft().displayGuiScreen(null);
 				}
-			}*/
+			}
 			if(TickrateChanger.ADVANCE_TICK) {
 				TickrateAPI.handlePausingGame(true);
 				TickrateChanger.ADVANCE_TICK=false;
-			}
+			}*/
 		}
 	}
 	@SubscribeEvent

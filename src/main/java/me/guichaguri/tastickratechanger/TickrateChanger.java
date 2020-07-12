@@ -56,7 +56,7 @@ public class TickrateChanger {
     public static Timer TASTIMER= new Timer(TICKS_PER_SECOND*3);
     //Used to check if the pause screen is up
     public static boolean WASZERO=false;
-
+    
     public TickrateChanger() {
         INSTANCE = this;
     }
@@ -70,7 +70,7 @@ public class TickrateChanger {
     		if(log) LOGGER.info("Updating client tickrate to " + tickrate);
     	}
 
-        TICKS_PER_SECOND = tickrate;
+        
         if(CHANGE_SOUND) GAME_SPEED = tickrate / 20F;
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -79,9 +79,11 @@ public class TickrateChanger {
         	mc.timer.tickLength = 1000F / tickrate;
         	TASTIMER.tickLength = 1000F / (tickrate*3);
         }else if(tickrate==0) {
+        	TICKRATE_SAVED=TICKS_PER_SECOND;
         	mc.timer.tickLength=Float.MAX_VALUE;
         	TASTIMER.tickLength=Float.MAX_VALUE;
         }
+        TICKS_PER_SECOND = tickrate;
     }
 
     public void updateServerTickrate(float tickrate, boolean log) {
