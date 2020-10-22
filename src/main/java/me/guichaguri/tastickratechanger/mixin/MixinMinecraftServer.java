@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import me.guichaguri.tastickratechanger.TickrateChanger;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncPackage;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncServer;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.network.ServerStatusResponse;
 import net.minecraft.server.MinecraftServer;
@@ -122,7 +124,18 @@ public abstract class MixinMinecraftServer {
                          this.tick();
                      }
                  }
-
+                 if(TickSyncServer.isEnabled()) {
+                	 if(TickSyncServer.getServertickcounter()==Integer.MAX_VALUE-1) {
+                		 TickSyncServer.resetTickCounter();
+                		 TickrateChanger.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), true, true));
+                	 }else {
+	                	 TickSyncServer.incrementServerTickCounter();
+	                	 TickrateChanger.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), false, true));
+                	 }
+            	 }else {
+            		 TickSyncServer.incrementServerTickCounter();
+            		 TickrateChanger.NETWORK.sendToAll(new TickSyncPackage(TickSyncServer.getServertickcounter(), false, false));
+            	 }
                  //Added Methods similar to Cubitick Mod
                  //Original line Thread.sleep(Math.max(1L, 50L - i));
 					msToTick = (long) (TickrateChanger.MILISECONDS_PER_TICK - i);

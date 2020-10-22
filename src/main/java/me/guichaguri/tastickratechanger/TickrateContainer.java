@@ -4,6 +4,11 @@ import org.lwjgl.input.Keyboard;
 
 import me.guichaguri.tastickratechanger.TickrateMessageHandler.TickrateMessage;
 import me.guichaguri.tastickratechanger.api.TickrateAPI;
+import me.guichaguri.tastickratechanger.ticksync.TickSync;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncCommand;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncPackage;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncPacketHandler;
+import me.guichaguri.tastickratechanger.ticksync.TickSyncServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
@@ -59,6 +64,7 @@ public class TickrateContainer {
         TickrateChanger.NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel("TickrateChanger");
         TickrateChanger.NETWORK.registerMessage(TickrateMessageHandler.class, TickrateMessage.class, 0, Side.CLIENT);
         TickrateChanger.NETWORK.registerMessage(TickrateMessageHandler.class, TickrateMessage.class, 1, Side.SERVER);
+        TickrateChanger.NETWORK.registerMessage(TickSyncPacketHandler.class, TickSyncPackage.class, 2, Side.CLIENT);
 
         TickrateChanger.CONFIG_FILE = event.getSuggestedConfigurationFile();
         Configuration cfg = new Configuration(TickrateChanger.CONFIG_FILE);
@@ -118,7 +124,9 @@ public class TickrateContainer {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new TickrateEvents());
+        if(event.getSide().isClient()) {
+        	MinecraftForge.EVENT_BUS.register(new TickrateEvents());
+        }
         new TickrateChanger();
         TickrateAPI.changeTickrate(TickrateChanger.DEFAULT_TICKRATE);
     }
@@ -127,6 +135,7 @@ public class TickrateContainer {
     public void start(FMLServerStartingEvent event) {
         TickrateChanger.COMMAND = new TickrateCommand();
         event.registerServerCommand(TickrateChanger.COMMAND);
+        event.registerServerCommand(new TickSyncCommand());
     }
 
     @EventHandler

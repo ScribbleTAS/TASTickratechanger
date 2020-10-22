@@ -20,6 +20,7 @@ import me.guichaguri.tastickratechanger.TASTickEvent;
 import me.guichaguri.tastickratechanger.TickrateChanger;
 import me.guichaguri.tastickratechanger.TickrateContainer;
 import me.guichaguri.tastickratechanger.api.TickrateAPI;
+import me.guichaguri.tastickratechanger.ticksync.TickSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -45,6 +46,7 @@ import net.minecraft.util.FrameTimer;
 import net.minecraft.util.Timer;
 import net.minecraft.util.Util;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -157,7 +159,23 @@ public abstract class MixinMinecraft {
         redoRunGameLoopHead();
 		for (int j = 0; j < Math.min(10, this.timer.elapsedTicks); ++j)
 		{
-			this.runTick();
+			//Ticksync
+			if(TickSync.isEnabled()&&Minecraft.getMinecraft().world!=null) {
+				if(TickSync.getClienttickcounter()==TickSync.getServertickcounter()) {
+					TickSync.incrementClienttickcounter();
+					this.runTick();
+				}else if(TickSync.getClienttickcounter()>TickSync.getServertickcounter()) {
+					continue;
+				}else if(TickSync.getClienttickcounter()<TickSync.getServertickcounter()) {
+					for(int h=0;h<TickSync.getServertickcounter()-TickSync.getClienttickcounter();h++) {
+						TickSync.incrementClienttickcounter();
+						this.runTick();
+					}
+				}
+			}else {
+				TickSync.incrementClienttickcounter();
+				this.runTick();
+			}
 		}
 		this.mcProfiler.endStartSection("preRenderErrors");
         long i1 = System.nanoTime() - l;
@@ -287,11 +305,6 @@ public abstract class MixinMinecraft {
     }
 	private void redoRunGameLoopHead() throws IOException {
 		bypass();
-		TickrateChanger.TASTIMER.updateTimer();
-		for (int j = 0; j < Math.min(10, TickrateChanger.TASTIMER.elapsedTicks); ++j)
-        {
-            MinecraftForge.EVENT_BUS.post(new TASTickEvent());
-        }
 		if(TickrateChanger.TICKS_PER_SECOND==0) {
 			TickrateChanger.WASZERO=true;
 			this.mcSoundHandler.pauseSounds();
