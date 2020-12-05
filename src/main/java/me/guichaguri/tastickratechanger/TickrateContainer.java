@@ -52,8 +52,8 @@ public class TickrateContainer {
     public static KeyBinding KEY_60 = null;
     public static KeyBinding KEY_100 = null;
     
-    public static int KEYCODE_PAUSE_KEY=Keyboard.KEY_F9;
-    public static int KEYCODE_ADVANCE_KEY=Keyboard.KEY_F10;
+    public static int KEYCODE_PAUSE_KEY=Keyboard.KEY_F8;
+    public static int KEYCODE_ADVANCE_KEY=Keyboard.KEY_F9;
     public static int COOLDOWN_PAUSE_KEY=0;
     public static int COOLDOWN_ADVANCE_KEY=0;
     
@@ -78,8 +78,8 @@ public class TickrateContainer {
         //Added in TASTickratechanger
         TickrateChanger.TICKCOUNTERBOARDER = (float) cfg.get("tickcounter", "tickrate", 2.0,
         		"In Tickrates below this value, a Tickcounter will be displayed in the console.").getDouble(2);
-        KEYCODE_PAUSE_KEY= cfg.get("Keybindings", "keycodePauseKey", Keyboard.KEY_F9, "Keycode for the Pause Key, default is F9, look up the keycode for the Keyboardkey you want").getInt();
-        KEYCODE_ADVANCE_KEY= cfg.get("Keybindings", "keycodeAdvanceKey", Keyboard.KEY_F10, "Keycode for the Pause Key, default is F10, look up the keycode for the Keyboardkey you want").getInt();
+        KEYCODE_PAUSE_KEY= cfg.get("Keybindings", "keycodePauseKey", Keyboard.KEY_F8, "Keycode for the Pause Key, default is F9, look up the keycode for the Keyboardkey you want").getInt();
+        KEYCODE_ADVANCE_KEY= cfg.get("Keybindings", "keycodeAdvanceKey", Keyboard.KEY_F9, "Keycode for the Pause Key, default is F10, look up the keycode for the Keyboardkey you want").getInt();
         //Also added to prevent people initialising the game with tickrate 0
         if(defticks>0) {
         	TickrateChanger.DEFAULT_TICKRATE=defticks;

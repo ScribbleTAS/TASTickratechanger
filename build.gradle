@@ -19,7 +19,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "Beta3"
+version = "Beta4"
 group = "me.guichaguri.tastickratechanger"
 archivesBaseName = "TASTickrateChanger-1.12.2"
 
