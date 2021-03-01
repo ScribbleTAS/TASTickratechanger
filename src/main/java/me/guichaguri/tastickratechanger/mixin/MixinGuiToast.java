@@ -84,7 +84,7 @@ public abstract class MixinGuiToast{
 		private long store=0L;
 		private boolean once=false;
 		private long offset=0L;
-		private long offsetting=0L;
+		private long delta=0L;
 		private float ticksave=TickrateChanger.TICKS_PER_SECOND;
 		
         public final T toast;
@@ -120,13 +120,20 @@ public abstract class MixinGuiToast{
     				once=false;
     				offset=Minecraft.getSystemTime()-store;
     			}
-    			animationTimer= (long)((Minecraft.getSystemTime()-offset)*(ticksave/20));
+    			animationTimer= (long)((Minecraft.getSystemTime()-offset)*(TickrateChanger.TICKS_PER_SECOND/20));
+    			
+    			if(ticksave!=TickrateChanger.TICKS_PER_SECOND) {
+    				ticksave=TickrateChanger.TICKS_PER_SECOND;
+    				animationTime=animationTimer-delta;
+    				visibleTime=animationTimer;
+    			}
+    			this.delta=animationTimer - this.animationTime;
     		}else{
     			if(!once) {
     				once=true;
     				store=(long) ((Minecraft.getSystemTime()-offset));
     			}
-    			animationTimer=(long) (store*(ticksave/20));
+    			animationTimer=(long) (store*(TickrateChanger.TICKRATE_SAVED/20));
     		}
 
             if (this.animationTime == -1L)
@@ -147,6 +154,7 @@ public abstract class MixinGuiToast{
 
             if (itoast$visibility != this.visibility)
             {
+            	System.out.println("Hit");
                 this.animationTime = animationTimer - (long)((int)((1.0F - this.getVisibility(animationTimer)) * 600.0F));
                 this.visibility = itoast$visibility;
                 this.visibility.playSound(mc.getSoundHandler());
